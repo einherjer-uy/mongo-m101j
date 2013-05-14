@@ -29,7 +29,7 @@ public class HelloWorldMongoDBSparkFreemarkerStyle {
 
         Mongo mongo = new Mongo("localhost:27017");
         DB db = mongo.getDB("blog");
-        final DBCollection postsCollection = db.getCollection("posts");
+        final DBCollection postsCollection = db.getCollection("users");
         
         Spark.get(new Route("/") {
             @Override
