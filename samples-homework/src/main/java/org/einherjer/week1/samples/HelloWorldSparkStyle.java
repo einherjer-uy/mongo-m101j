@@ -1,4 +1,4 @@
-package org.einherjer;
+package org.einherjer.week1.samples;
 
 import spark.Request;
 import spark.Response;

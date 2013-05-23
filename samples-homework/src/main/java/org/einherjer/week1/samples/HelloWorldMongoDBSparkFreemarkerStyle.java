@@ -1,4 +1,4 @@
-package org.einherjer;
+package org.einherjer.week1.samples;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -36,10 +36,12 @@ public class HelloWorldMongoDBSparkFreemarkerStyle {
             public Object handle(final Request request, final Response response) {
                 StringWriter writer = new StringWriter();
                 try {
-                    Template helloTemplate = config.getTemplate("hello.ftl");
+                    Template helloTemplate = config.getTemplate("week1/samples/hello.ftl");
                     DBObject document = postsCollection.findOne();
 
-                    helloTemplate.process(document, writer); //BasicDBObject extends BasicBSONObject implements DBObject -> BasicBSONObject extends LinkedHashMap
+                    //BasicDBObject extends BasicBSONObject implements DBObject -> BasicBSONObject extends LinkedHashMap,
+                    //  that's why BasicDBObject can be use here in the place of a Map
+                    helloTemplate.process(document, writer);
                 }
                 catch (IOException e) {
                     e.printStackTrace();
