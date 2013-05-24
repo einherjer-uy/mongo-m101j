@@ -1,30 +1,33 @@
 package course;
 
 
-import com.mongodb.DB;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
-import freemarker.template.Configuration;
-import freemarker.template.SimpleHash;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import org.apache.commons.lang3.StringEscapeUtils;
-import spark.Request;
-import spark.Response;
-import spark.Route;
+import static spark.Spark.get;
+import static spark.Spark.post;
+import static spark.Spark.setPort;
 
-import javax.servlet.http.Cookie;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
-import static spark.Spark.get;
-import static spark.Spark.post;
-import static spark.Spark.setPort;
+import javax.servlet.http.Cookie;
+
+import org.apache.commons.lang3.StringEscapeUtils;
+
+import spark.Request;
+import spark.Response;
+import spark.Route;
+
+import com.mongodb.DB;
+import com.mongodb.DBObject;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+
+import freemarker.template.Configuration;
+import freemarker.template.SimpleHash;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 
 /**
  * This class encapsulates the controllers for the blog web application.  It delegates all interaction with MongoDB
@@ -89,23 +92,30 @@ public class BlogController {
     }
 
     private void initializeRoutes() throws IOException {
-        // this is the blog home page
-        get(new FreemarkerBasedRoute("/", "blog_template.ftl") {
+        // present signup form for blog
+        //      (STEP 1 - GET /signup just replies with the page
+        //          Also, the redirect from step 3 if browsing /welcome without a valid cookie also lands here)
+        get(new FreemarkerBasedRoute("/signup", "signup.ftl") {
             @Override
-            public void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
-                String username = sessionDAO.findUserNameBySessionId(getSessionCookie(request));
+            protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
 
-               // this is where we would normally load up the blog data
-               // but this week, we just display a placeholder.
-                HashMap<String, String> root = new HashMap<String, String>();
+                SimpleHash root = new SimpleHash();
+
+                // initialize values for the form.
+                root.put("username", "");
+                root.put("password", "");
+                root.put("email", "");
+                root.put("password_error", "");
+                root.put("username_error", "");
+                root.put("email_error", "");
+                root.put("verify_error", "");
 
                 template.process(root, writer);
             }
         });
 
-
-
         // handle the signup post
+        //      (STEP 2 - POST /signup inserts the user in mongo, adds a cookie called "session" to the response, and redirects to /welcome)
         post(new FreemarkerBasedRoute("/signup", "signup.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
@@ -143,30 +153,9 @@ public class BlogController {
             }
         });
 
-        // present signup form for blog
-        get(new FreemarkerBasedRoute("/signup", "signup.ftl") {
-            @Override
-            protected void doHandle(Request request, Response response, Writer writer)
-                    throws IOException, TemplateException {
-
-                SimpleHash root = new SimpleHash();
-
-                // initialize values for the form.
-                root.put("username", "");
-                root.put("password", "");
-                root.put("email", "");
-                root.put("password_error", "");
-                root.put("username_error", "");
-                root.put("email_error", "");
-                root.put("verify_error", "");
-
-                template.process(root, writer);
-            }
-        });
-
-
-
-
+        // (STEP 3 - the redirect from step 2 triggers a GET /welcome, which validates the "session" cookie
+        //      and replies with the welcome page if the cookie is valid, or redirects to /signup if it is not
+        //      Also, browsing /welcome directly also lands here)
         get(new FreemarkerBasedRoute("/welcome", "welcome.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
@@ -191,6 +180,7 @@ public class BlogController {
 
 
         // present the login page
+        //  (browsing /login just replies with the page)
         get(new FreemarkerBasedRoute("/login", "login.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
@@ -203,7 +193,7 @@ public class BlogController {
             }
         });
 
-        // process output coming from login form. On success redirect folks to the welcome page
+        // process the "submit" of the login form. On success adds a cookie called "session" to the response, and redirects to /welcome
         // on failure, just return an error and let them try again.
         post(new FreemarkerBasedRoute("/login", "login.ftl") {
             @Override
@@ -245,7 +235,7 @@ public class BlogController {
 
 
 
-        // allows the user to logout of the blog
+        // allows the user to logout of the blog (deletes the cookie and redirects to /login)
         get(new FreemarkerBasedRoute("/logout", "signup.ftl") {
             @Override
             protected void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
@@ -271,6 +261,19 @@ public class BlogController {
             }
         });
 
+        // this is the blog home page
+        get(new FreemarkerBasedRoute("/", "blog_template.ftl") {
+            @Override
+            public void doHandle(Request request, Response response, Writer writer) throws IOException, TemplateException {
+                String username = sessionDAO.findUserNameBySessionId(getSessionCookie(request));
+
+                // this is where we would normally load up the blog data
+                // but this week, we just display a placeholder.
+                HashMap<String, String> root = new HashMap<String, String>();
+
+                template.process(root, writer);
+            }
+        });
 
         // used to process internal errors
         get(new FreemarkerBasedRoute("/internal_error", "error_template.ftl") {
