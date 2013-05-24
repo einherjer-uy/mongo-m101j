@@ -17,18 +17,20 @@
 
 package course;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
-import com.mongodb.MongoException;
-import sun.misc.BASE64Encoder;
-
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
+
+import sun.misc.BASE64Encoder;
+
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBObject;
+import com.mongodb.MongoException;
+import com.mongodb.QueryBuilder;
 
 public class UserDAO {
     private final DBCollection usersCollection;
@@ -40,24 +42,15 @@ public class UserDAO {
 
     // validates that username is unique and insert into db
     public boolean addUser(String username, String password, String email) {
-
+        BasicDBObject doc = new BasicDBObject("_id", username);
         String passwordHash = makePasswordHash(password, Integer.toString(random.nextInt()));
-
-        // XXX WORK HERE
-        // create an object suitable for insertion into the user collection
-        // be sure to add username and hashed password to the document. problem instructions
-        // will tell you the schema that the documents must follow.
-
-
-
+        doc.put("password", passwordHash);
         if (email != null && !email.equals("")) {
-            // XXX WORK HERE
-            // if there is an email address specified, add it to the document too.
+            doc.put("email", email);
         }
 
         try {
-            // XXX WORK HERE
-            // insert the document into the user collection here
+            usersCollection.insert(doc);
             return true;
         } catch (MongoException.DuplicateKey e) {
             System.out.println("Username already in use: " + username);
@@ -66,10 +59,7 @@ public class UserDAO {
     }
 
     public DBObject validateLogin(String username, String password) {
-        DBObject user = null;
-
-        // XXX look in the user collection for a user that has this username
-        // assign the result to the user variable.
+        DBObject user = usersCollection.findOne(QueryBuilder.start("_id").is(username).get());
 
         if (user == null) {
             System.out.println("User not in database");
