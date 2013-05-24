@@ -17,22 +17,22 @@
 
 package org.einherjer.week2.samples;
 
+import java.net.UnknownHostException;
+import java.util.Random;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.Mongo;
 import com.mongodb.QueryBuilder;
-
-import java.net.UnknownHostException;
-import java.util.Random;
 
 public class FieldSelectionSample {
     public static void main(String[] args) throws UnknownHostException {
-        MongoClient client = new MongoClient();
+        Mongo client = new Mongo();
         DB db = client.getDB("course");
-        DBCollection collection = db.getCollection("fieldSelectionTest");
+        DBCollection collection = db.getCollection("fieldSelectionSample");
         collection.drop();
         Random rand = new Random();
 
@@ -47,6 +47,7 @@ public class FieldSelectionSample {
         DBObject query = QueryBuilder.start("x").is(0)
                 .and("y").greaterThan(10).lessThan(70).get();
 
+        //use second find parameter to filter the returned fields
         DBCursor cursor = collection.find(query,
                 new BasicDBObject("y", true).append("_id", false));
         try {

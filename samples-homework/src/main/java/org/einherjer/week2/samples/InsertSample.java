@@ -17,26 +17,40 @@
 
 package org.einherjer.week2.samples;
 
+import java.net.UnknownHostException;
+
+import org.bson.types.ObjectId;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-
-import java.net.UnknownHostException;
+import com.mongodb.Mongo;
 
 public class InsertSample {
     public static void main(String[] args) throws UnknownHostException {
-        MongoClient client = new MongoClient();
+        Mongo client = new Mongo();
         DB courseDB = client.getDB("course");
-        DBCollection collection = courseDB.getCollection("insertTest");
+        DBCollection collection = courseDB.getCollection("insertSample");
 
         collection.drop();
 
         DBObject doc = new BasicDBObject().append("x", 1);
+        System.out.println(doc);
+        collection.insert(doc);
+        System.out.println(doc); //_id field gets generated
 
-        collection.insert(doc);
-        collection.insert(doc);
+        DBObject doc2 = new BasicDBObject("_id", new ObjectId()).append("x", 1);
+        System.out.println(doc2);
+        collection.insert(doc2);
+        System.out.println(doc2); //same as doc1
+
+        DBObject doc3 = new BasicDBObject("_id", "123").append("x", 1);
+        System.out.println(doc3);
+        collection.insert(doc3);
+        System.out.println(doc3); //_id field set by to a type different than ObjectId
+
+        collection.insert(doc); //duplicate exception
 
     }
 }

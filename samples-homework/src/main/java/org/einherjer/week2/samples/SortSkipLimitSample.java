@@ -17,21 +17,21 @@
 
 package org.einherjer.week2.samples;
 
+import java.net.UnknownHostException;
+import java.util.Random;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-
-import java.net.UnknownHostException;
-import java.util.Random;
+import com.mongodb.Mongo;
 
 public class SortSkipLimitSample {
     public static void main(String[] args) throws UnknownHostException {
-        MongoClient client = new MongoClient();
+        Mongo client = new Mongo();
         DB db = client.getDB("course");
-        DBCollection lines = db.getCollection("SortSkipLimitTest");
+        DBCollection lines = db.getCollection("sortSkipLimitSample");
         lines.drop();
         Random rand = new Random();
 

@@ -17,15 +17,15 @@
 
 package org.einherjer.week2.samples;
 
+import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.List;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
-import com.mongodb.MongoClient;
-
-import java.net.UnknownHostException;
-import java.util.Arrays;
-import java.util.List;
+import com.mongodb.Mongo;
 
 public class UpdateRemoveSample {
     public static void main(String[] args) throws UnknownHostException {
@@ -43,18 +43,20 @@ public class UpdateRemoveSample {
 
     // these are all the statement I used throughout the lecture.
     private static void scratch(DBCollection collection) {
+        //whole document replacement, remember the _id field is not replaces so in this case, since _id was the only field, age gets added
+        //  if we do this a second time with gender:"F" instead of age:24 the document would end up with _id and gender fields, and age would be gone
         collection.update(new BasicDBObject("_id", "alice"),
                 new BasicDBObject("age", 24));
 
+        //sets adds the gender field to the existing _id and age fields
         collection.update(new BasicDBObject("_id", "alice"),
-                new BasicDBObject("$set", new BasicDBObject("age", 24)));
+                new BasicDBObject("$set", new BasicDBObject("gender", "F")));
 
-        collection.update(new BasicDBObject("_id", "alice"),
-                new BasicDBObject(new BasicDBObject("gender", "F")));
-
+        //upsert ("frank" didn't exist originally, so this update actually performs an insert)
         collection.update(new BasicDBObject("_id", "frank"),
                 new BasicDBObject("$set", new BasicDBObject("age", 24)), true, false);
 
+        //multi document update
         collection.update(new BasicDBObject(),
                 new BasicDBObject("$set", new BasicDBObject("title", "Dr")), false, true);
 
@@ -62,9 +64,9 @@ public class UpdateRemoveSample {
     }
 
     private static DBCollection createCollection() throws UnknownHostException {
-        MongoClient client = new MongoClient();
+        Mongo client = new Mongo();
         DB db = client.getDB("course");
-        DBCollection collection = db.getCollection("UpdateRemoveTest");
+        DBCollection collection = db.getCollection("updateRemoveSample");
         collection.drop();
         return collection;
     }

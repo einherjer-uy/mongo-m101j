@@ -10,8 +10,8 @@ import com.mongodb.Mongo;
 public class CrudHomework {
 
     /**
-     * assumes the existance of a db students with a collection grades,
-     * each document with student_id, tyKAdoce11pe, score
+     * assumes the existence of a DB "students" with a collection "grades",
+     * each document with student_id, type, score
      */
     public static void main(String[] args) throws UnknownHostException {
         Mongo mongo = new Mongo("localhost:27017");

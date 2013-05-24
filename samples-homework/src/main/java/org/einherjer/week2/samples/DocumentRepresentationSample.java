@@ -40,8 +40,10 @@ public class DocumentRepresentationSample {
         doc.put("address", new BasicDBObject("street", "20 Main")
                 .append("town", "Westfield")
                 .append("zip", "56789"));
+        System.out.println(doc);
         
         //3- using BasicDBObjectBuilder
         DBObject johnSmithDoc = BasicDBObjectBuilder.start().append("firstname", "John").append("lastname","Smith").get();
+        System.out.println(johnSmithDoc);
     }
 }

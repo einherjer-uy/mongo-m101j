@@ -17,22 +17,22 @@
 
 package org.einherjer.week2.samples;
 
+import java.net.UnknownHostException;
+import java.util.Random;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.Mongo;
 import com.mongodb.QueryBuilder;
-
-import java.net.UnknownHostException;
-import java.util.Random;
 
 public class FindCriteriaSample {
     public static void main(String[] args) throws UnknownHostException {
-        MongoClient client = new MongoClient();
+        Mongo client = new Mongo();
         DB db = client.getDB("course");
-        DBCollection collection = db.getCollection("findCriteriaTest");
+        DBCollection collection = db.getCollection("findCriteriaSample");
         collection.drop();
 
         // insert 10 documents with two random integers
@@ -42,8 +42,10 @@ public class FindCriteriaSample {
                             .append("y", new Random().nextInt(100)));
         }
 
+        //1- The query document can be created by using a QueryBuilder...
         QueryBuilder builder = QueryBuilder.start("x").is(0)
                 .and("y").greaterThan(10).lessThan(70);
+        //2- or, the query document can be created manually
         DBObject query = new BasicDBObject("x", 0)
                 .append("y", new BasicDBObject("$gt", 10).append("$lt", 90));
 

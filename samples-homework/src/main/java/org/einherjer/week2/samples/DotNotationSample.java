@@ -17,22 +17,22 @@
 
 package org.einherjer.week2.samples;
 
+import java.net.UnknownHostException;
+import java.util.Random;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
+import com.mongodb.Mongo;
 import com.mongodb.QueryBuilder;
-
-import java.net.UnknownHostException;
-import java.util.Random;
 
 public class DotNotationSample {
     public static void main(String[] args) throws UnknownHostException {
-        MongoClient client = new MongoClient();
+        Mongo client = new Mongo();
         DB db = client.getDB("course");
-        DBCollection lines = db.getCollection("DotNotationTest");
+        DBCollection lines = db.getCollection("dotNotationSample");
         lines.drop();
         Random rand = new Random();
 

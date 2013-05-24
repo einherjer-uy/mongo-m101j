@@ -17,14 +17,14 @@
 
 package org.einherjer.week2.samples;
 
+import java.net.UnknownHostException;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.MongoClient;
-
-import java.net.UnknownHostException;
+import com.mongodb.Mongo;
 
 public class FindAndModifySample {
     public static void main(String[] args) throws UnknownHostException {
@@ -61,9 +61,9 @@ public class FindAndModifySample {
    }
 
     private static DBCollection createCollection() throws UnknownHostException {
-        MongoClient client = new MongoClient();
+        Mongo client = new Mongo();
         DB db = client.getDB("course");
-        return db.getCollection("FindModifyTest");
+        return db.getCollection("findModifySample");
     }
 
     private static void printCollection(final DBCollection collection) {
